@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#c8a96e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cine Iraní">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>سینمای ایران — Cine Iraní</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0c0a;color:#e8dcc8;font-family:Georgia,'Times New Roman',serif;min-height:100vh}
+header{background:linear-gradient(180deg,#1a1508 0%,#0d0c0a 100%);border-bottom:1px solid #3a3020;padding:1.5rem 1rem 1rem}
+header .ey{font-size:.65rem;letter-spacing:.3em;color:#a09070;text-transform:uppercase;margin-bottom:.4rem}
+header h1{font-size:1.8rem;font-weight:normal;color:#e8dcc8}
+header p{color:#8a7a5a;font-size:.85rem;font-style:italic;margin-top:.3rem}
+.controls{background:#110f0a;border-bottom:1px solid #2a2010;padding:.8rem 1rem;position:sticky;top:0;z-index:20;display:flex;flex-direction:column;gap:.5rem}
+.cr{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
+.sb{padding:.3rem .6rem;background:transparent;color:#8a7a5a;border:1px solid #3a3020;border-radius:3px;cursor:pointer;font-size:.72rem;font-family:inherit;letter-spacing:.05em;transition:all .15s;-webkit-tap-highlight-color:transparent}
+.sb.active{background:#c8a96e;color:#0d0c0a;border-color:#c8a96e}
+select{background:#1a1508;color:#c8b890;border:1px solid #3a3020;border-radius:3px;padding:.3rem .5rem;font-size:.72rem;font-family:inherit;cursor:pointer;flex:1;min-width:120px}
+.cnt{padding:.5rem 1rem 0;font-size:.72rem;color:#5a4a30;letter-spacing:.1em}
+.grid{padding:.8rem 1rem 3rem;display:flex;flex-direction:column;gap:.7rem}
+.card{border:1px solid #2a2010;border-left:3px solid var(--c);border-radius:4px;padding:1rem;cursor:pointer;background:#110f0a;transition:border-color .15s,background .15s;-webkit-tap-highlight-color:transparent}
+.card.open{background:#1a1508;border-color:var(--c)}
+.ct{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.3rem;gap:.5rem}
+.yr{font-size:.75rem;color:var(--c);letter-spacing:.1em;flex-shrink:0}
+.df{font-size:.62rem;padding:.15rem .5rem;border-radius:2px;letter-spacing:.04em;flex-shrink:0}
+.da{background:#1a3020;color:#6ab080}.di{background:#2a2010;color:#c8a96e}.dv{background:#2a1010;color:#c87070}
+.ti{font-size:.98rem;font-weight:normal;color:#e8dcc8;line-height:1.3;margin-bottom:.15rem}
+.or{font-size:.72rem;color:#5a4a30;font-style:italic;margin-bottom:.35rem}
+.dr{font-size:.72rem;color:#8a7a5a;margin-bottom:.5rem}
+
+/* Scores row */
+.scores{display:flex;gap:.5rem;margin-bottom:.6rem;flex-wrap:wrap}
+.sc{display:flex;align-items:center;gap:.3rem;font-size:.7rem;padding:.2rem .5rem;border-radius:3px;font-family:inherit}
+.sc-imdb{background:#2a2208;border:1px solid #4a3a10;color:#f5c518}
+.sc-rt-fresh{background:#0a2a0a;border:1px solid #1a5a1a;color:#66cc00}
+.sc-rt-rotten{background:#2a0a0a;border:1px solid #5a1a1a;color:#fa320a}
+.sc-rt-cert{background:#0d1f2d;border:1px solid #1a4060;color:#66ccff}
+.sc-label{font-size:.6rem;opacity:.7}
+
+.de{font-size:.82rem;color:#a09070;line-height:1.5;margin-bottom:.7rem}
+.tags{display:flex;flex-wrap:wrap;gap:.3rem}
+.tg{font-size:.62rem;padding:.12rem .45rem;background:#1a1810;border:1px solid #3a3020;border-radius:2px;color:#7a6a4a}
+.extra{margin-top:.8rem;padding-top:.8rem;border-top:1px solid #2a2010;display:none}
+.card.open .extra{display:block}
+.er{font-size:.72rem;color:#8a7a5a;margin-bottom:.4rem;line-height:1.5}
+
+/* Streaming badges */
+.stream{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem}
+.sp{font-size:.65rem;padding:.2rem .5rem;border-radius:3px;font-family:inherit;font-weight:bold;letter-spacing:.02em}
+.sp-mubi{background:#0a2a3a;border:1px solid #0070a0;color:#00aadd}
+.sp-netflix{background:#1a0a0a;border:1px solid #e50914;color:#e50914}
+.sp-prime{background:#0a1a2a;border:1px solid #00a8e1;color:#00a8e1}
+.sp-criterion{background:#1a1a0a;border:1px solid #c8a040;color:#c8a040}
+.sp-kanopy{background:#0a1a0a;border:1px solid #5a9a5a;color:#7acc7a}
+.sp-youtube{background:#1a0a0a;border:1px solid #cc2020;color:#ff4040}
+.sp-fandor{background:#0a0a1a;border:1px solid #5050aa;color:#8888dd}
+.sp-rent{background:#1a1a1a;border:1px solid #4a4a4a;color:#aaaaaa}
+
+footer{border-top:1px solid #2a2010;padding:1.2rem 1rem;background:#080705}
+.fl{font-size:.62rem;letter-spacing:.2em;color:#3a3020;text-transform:uppercase;margin-bottom:.7rem}
+.dl{display:flex;flex-direction:column;gap:.5rem}
+.di2{display:flex;align-items:center;gap:.5rem;cursor:pointer;padding:.3rem 0;-webkit-tap-highlight-color:transparent}
+.dd{width:10px;height:10px;border-radius:1px;flex-shrink:0}
+.dn{font-size:.78rem;color:#8a7a5a}
+.dc{font-size:.68rem;color:#3a3020}
+.di2.dimmed{opacity:.3}
+.nr{text-align:center;color:#5a4a30;font-style:italic;padding:3rem 1rem;font-size:.9rem}
+#ib{display:none;background:#1a1508;border-bottom:1px solid #c8a96e;padding:.7rem 1rem;align-items:center;justify-content:space-between;gap:.5rem}
+#ib.show{display:flex}
+#ib span{font-size:.78rem;color:#c8b890}
+#ibb{background:#c8a96e;color:#0d0c0a;border:none;padding:.4rem .9rem;border-radius:3px;font-size:.75rem;font-family:inherit;cursor:pointer;white-space:nowrap}
+#db{background:none;border:none;color:#5a4a30;font-size:1.2rem;cursor:pointer;padding:0 .3rem}
+.era-label{font-size:.65rem;letter-spacing:.2em;color:#3a3020;text-transform:uppercase;padding:.8rem 0 .3rem;border-bottom:1px solid #1a1508;margin-bottom:.3rem}
+</style>
+</head>
+<body>
+
+<div id="ib">
+  <span>📱 Instalá como app en tu pantalla de inicio</span>
+  <button id="ibb">Instalar</button>
+  <button id="db">✕</button>
+</div>
+
+<header>
+  <div class="ey">Cinematografía Iraní</div>
+  <h1>سینمای ایران</h1>
+  <p id="sub">45 películas · 10 directores · 1963–2024</p>
+</header>
+
+<div class="controls">
+  <div class="cr">
+    <span style="font-size:.62rem;color:#5a4a30;letter-spacing:.1em">ORDEN</span>
+    <button class="sb active" data-sort="year_asc">Año ↑</button>
+    <button class="sb" data-sort="year_desc">Año ↓</button>
+    <button class="sb" data-sort="imdb">IMDB ↓</button>
+    <button class="sb" data-sort="director">Director</button>
+    <button class="sb" data-sort="difficulty">Nivel</button>
+  </div>
+  <div class="cr">
+    <select id="sd"><option value="">Todos los directores</option></select>
+    <select id="sdiff">
+      <option value="">Todo nivel</option>
+      <option>Accesible</option><option>Iniciado</option><option>Avanzado</option>
+    </select>
+  </div>
+  <div class="cr">
+    <select id="sth"><option value="">Toda temática</option></select>
+    <select id="sst"><option value="">Toda plataforma</option></select>
+  </div>
+</div>
+
+<div class="cnt" id="cl"></div>
+<div class="grid" id="fg"></div>
+
+<footer>
+  <div class="fl">Directores — tocá para filtrar</div>
+  <div class="dl" id="dl"></div>
+  <div style="margin-top:1.2rem;padding-top:1rem;border-top:1px solid #1a1508">
+    <div class="fl">Plataformas</div>
+    <div style="display:flex;flex-wrap:wrap;gap:.4rem;font-size:.65rem">
+      <span class="sp sp-mubi">MUBI</span><span style="color:#5a4a30">Arte, festivales</span>
+      <span class="sp sp-criterion">CRITERION</span><span style="color:#5a4a30">Clásicos</span>
+      <span class="sp sp-kanopy">KANOPY</span><span style="color:#5a4a30">Gratis con biblioteca</span>
+      <span class="sp sp-netflix">NETFLIX</span>
+      <span class="sp sp-prime">PRIME</span>
+      <span class="sp sp-youtube">YOUTUBE</span><span style="color:#5a4a30">Algunas gratis</span>
+      <span class="sp sp-rent">ALQUILER</span><span style="color:#5a4a30">iTunes/Google</span>
+    </div>
+    <div style="margin-top:.8rem;font-size:.65rem;color:#3a3020;font-style:italic">
+      * Disponibilidad varía por región y puede cambiar. MUBI rota su catálogo mensualmente.
+    </div>
+  </div>
+</footer>
+
+<script>
+const F=[
+  // ── CLÁSICOS PRE-REVOLUCIÓN Y FUNDADORES ──
+  {title:"La casa negra",original:"Khaneh siah ast",director:"Forugh Farrokhzad",year:1963,theme:["Documental","Lepra","Poesía"],region:"Colonia de leprosos, Tabriz",awards:["Oberhausen Film Festival"],desc:"La única película de la poeta maldita Farrokhzad. Documental de 22 minutos en una colonia de leprosos. Fundamento de todo el cine iraní que vendría. Una obra maestra absoluta.",difficulty:"Avanzado",color:"#9a7a9a",imdb:8.2,rt:100,streaming:["MUBI","YOUTUBE"],era:"Clásicos"},
+  {title:"La vaca",original:"Gav",director:"Dariush Mehrjui",year:1969,theme:["Identidad","Vida rural","Locura"],region:"Aldea rural iraní",awards:["Festival de Venecia"],desc:"Un aldeano tan unido a su vaca que cuando el animal muere enloquece y cree ser él mismo la vaca. La película que fundó la Nueva Ola iraní. Jomeini la aprobó después de la revolución.",difficulty:"Iniciado",color:"#7a8a6a",imdb:7.9,rt:96,streaming:["MUBI","CRITERION","KANOPY"],era:"Clásicos"},
+  {title:"El ciervo",original:"Gavaznha",director:"Masud Kimiai",year:1974,theme:["Amistad","Honor","Fugitivos"],region:"Teherán",awards:["Semana de la Crítica Cannes"],desc:"Un adicto en fuga se refugia en casa de su amigo. Un thriller de lealtad y honor en el Teherán pre-revolución. Behrouz Vossoughi en su papel más icónico. Cine negro iraní puro.",difficulty:"Iniciado",color:"#8a7060",imdb:7.9,rt:90,streaming:["MUBI","KANOPY","RENT"],era:"Clásicos"},
+  {title:"Bashu, el pequeño extraño",original:"Bashu, Gharibeh-ye Kuchak",director:"Bahram Beyzai",year:1989,theme:["Guerra","Infancia","Identidad"],region:"Norte de Irán (Gilan)",awards:["Festival de Fajr"],desc:"Un niño árabe del sur huye de la guerra Irán-Irak y llega al verde norte iraní. Una mujer gilaki lo acoge. La película más humana sobre la guerra que Irán produjo jamás.",difficulty:"Accesible",color:"#6a9080",imdb:8.1,rt:98,streaming:["MUBI","KANOPY"],era:"Clásicos"},
+  {title:"Hamoun",original:"Hamoun",director:"Dariush Mehrjui",year:1990,theme:["Crisis existencial","Clase media","Sueños"],region:"Teherán",awards:["Festival de Fajr — Mejor Película"],desc:"Un intelectual de mediana edad en crisis: su mujer lo deja, no puede terminar su tesis doctoral. La película más citada por los iraníes de clase media. El Fellini iraní. Obra de culto máximo.",difficulty:"Avanzado",color:"#7a8a6a",imdb:8.2,rt:95,streaming:["MUBI","KANOPY","RENT"],era:"Clásicos"},
+
+  // ── KIAROSTAMI ──
+  {title:"¿Dónde está la casa de mi amigo?",original:"Khane-ye doust kodjast?",director:"Abbas Kiarostami",year:1987,theme:["Infancia","Vida rural","Responsabilidad"],region:"Norte — Koker, Gilan",awards:["Leopardo de Bronce Locarno"],desc:"Un niño recorre dos aldeas buscando la casa de su compañero para devolverle el cuaderno. El más puro retrato de la infancia rural del norte iraní. Primer film de la trilogía Koker.",difficulty:"Accesible",color:"#c8a96e",imdb:7.8,rt:100,streaming:["CRITERION","MUBI","KANOPY"],era:"Kiarostami"},
+  {title:"Close-Up",original:"Nema-ye Nazdik",director:"Abbas Kiarostami",year:1990,theme:["Identidad","Cine dentro del cine","Clase media"],region:"Teherán",awards:["Top 10 Sight & Sound","BFI Top 100"],desc:"Un hombre pobre se hace pasar por el director Makhmalbaf. Documental y ficción fundidos. Considerada una de las 10 mejores películas de la historia por la crítica especializada.",difficulty:"Iniciado",color:"#c8a96e",imdb:8.0,rt:100,streaming:["CRITERION","MUBI","KANOPY"],era:"Kiarostami"},
+  {title:"Y la vida continúa",original:"Zendegi va digar hich",director:"Abbas Kiarostami",year:1992,theme:["Terremoto","Supervivencia","Vida rural"],region:"Norte — Koker post-terremoto 1990",awards:["Premio Especial del Jurado Cannes"],desc:"Kiarostami regresa a los pueblos destruidos por el terremoto del 90 buscando a los actores de su película anterior. La vida que persiste contra todo. Segundo film de la trilogía.",difficulty:"Accesible",color:"#c8a96e",imdb:7.8,rt:97,streaming:["CRITERION","MUBI","KANOPY"],era:"Kiarostami"},
+  {title:"A través de los olivos",original:"Zir-e darakhatan zeyton",director:"Abbas Kiarostami",year:1994,theme:["Amor","Cine dentro del cine","Vida rural"],region:"Norte — Golestán",awards:["Nominada Palma de Oro Cannes"],desc:"Tercer film de la trilogía Koker. Un actor no profesional corteja a su compañera durante el rodaje. La frontera entre ficción y vida real disuelta completamente.",difficulty:"Iniciado",color:"#c8a96e",imdb:7.7,rt:97,streaming:["CRITERION","MUBI","KANOPY"],era:"Kiarostami"},
+  {title:"El sabor de las cerezas",original:"Ta'm e guilass",director:"Abbas Kiarostami",year:1997,theme:["Muerte","Suicidio","Filosofía"],region:"Teherán (periferia árida)",awards:["Palma de Oro Cannes 1997"],desc:"Un hombre busca a alguien que lo entierre después de suicidarse. Tres encuentros en el camino. La pregunta sobre el sentido de vivir más directa y más oblicua del cine iraní.",difficulty:"Avanzado",color:"#c8a96e",imdb:7.8,rt:91,streaming:["CRITERION","MUBI","KANOPY","PRIME"],era:"Kiarostami"},
+  {title:"El viento nos llevará",original:"Bad ma ra khahad bord",director:"Abbas Kiarostami",year:1999,theme:["Muerte","Vida rural","Modernidad vs tradición"],region:"Kurdistán iraní — aldea de Siah Dareh",awards:["León de Plata Venecia"],desc:"Un equipo de televisión espera la muerte de una anciana en un pueblo kurdo. La espera como modo de estar en el mundo. Kiarostami en su forma más pura y más difícil.",difficulty:"Avanzado",color:"#c8a96e",imdb:7.7,rt:95,streaming:["CRITERION","MUBI","KANOPY"],era:"Kiarostami"},
+  {title:"Ten",original:"Dah",director:"Abbas Kiarostami",year:2002,theme:["Mujeres","Teherán","Identidad"],region:"Teherán — interior de un auto",awards:["Nominada Palma de Oro Cannes"],desc:"Diez conversaciones filmadas con una cámara fija en el interior de un auto conducido por una mujer. Las mujeres iraníes hablan de amor, divorcio, prostitución, fe. Sin actores profesionales.",difficulty:"Avanzado",color:"#c8a96e",imdb:7.5,rt:88,streaming:["CRITERION","MUBI","KANOPY"],era:"Kiarostami"},
+
+  // ── PANAHI ──
+  {title:"El globo blanco",original:"Badkonak-e sefid",director:"Jafar Panahi",year:1995,theme:["Infancia","Año Nuevo persa","Teherán"],region:"Teherán — Año Nuevo 1373",awards:["Cámara de Oro Cannes"],desc:"Una niña quiere un pez dorado para el Año Nuevo. Guión de Kiarostami. Una hora en tiempo real. La primera obra maestra de Panahi. La más accesible del cine iraní.",difficulty:"Accesible",color:"#7a9e8a",imdb:7.6,rt:100,streaming:["MUBI","KANOPY","CRITERION"],era:"Panahi"},
+  {title:"El espejo",original:"Ayneh",director:"Jafar Panahi",year:1997,theme:["Infancia","Cine dentro del cine","Teherán"],region:"Teherán",awards:["Leopardo de Oro Locarno"],desc:"Una niña que rodaba una película la abandona a mitad. La cámara la sigue de todas formas. La ruptura más radical de la cuarta pared en la historia del cine iraní.",difficulty:"Avanzado",color:"#7a9e8a",imdb:7.5,rt:97,streaming:["MUBI","KANOPY"],era:"Panahi"},
+  {title:"El círculo",original:"Dayereh",director:"Jafar Panahi",year:2000,theme:["Mujeres","Represión","Derechos humanos"],region:"Teherán",awards:["León de Oro Venecia"],desc:"Varias mujeres iraníes intentan sobrevivir un día en Teherán. Un círculo kafkiano donde cada puerta que se abre revela otra más cerrada. Prohibida en Irán.",difficulty:"Iniciado",color:"#7a9e8a",imdb:7.7,rt:96,streaming:["MUBI","KANOPY","CRITERION"],era:"Panahi"},
+  {title:"Crimson Gold",original:"Talaye Sorkh",director:"Jafar Panahi",year:2003,theme:["Clase obrera","Desigualdad","Violencia"],region:"Teherán",awards:["Un Certain Regard Cannes"],desc:"Un repartidor de pizza planea asaltar una joyería. Basada en hechos reales. Guión de Kiarostami. La brecha de clases en el Teherán de lujos y pobreza extrema.",difficulty:"Iniciado",color:"#7a9e8a",imdb:7.6,rt:97,streaming:["MUBI","KANOPY"],era:"Panahi"},
+  {title:"Offside",original:"Offside",director:"Jafar Panahi",year:2006,theme:["Mujeres","Fútbol","Resistencia cotidiana"],region:"Estadio Azadi, Teherán",awards:["Oso de Plata Berlín"],desc:"Mujeres disfrazadas de hombre intentan entrar al estadio durante la clasificación al Mundial 2006. Filmada durante el partido real con actores no profesionales.",difficulty:"Accesible",color:"#7a9e8a",imdb:7.5,rt:97,streaming:["MUBI","KANOPY","PRIME"],era:"Panahi"},
+  {title:"Esto no es una película",original:"In film nist",director:"Jafar Panahi",year:2011,theme:["Censura","Cine dentro del cine","Resistencia"],region:"Apartamento de Panahi, Teherán",awards:["Cannes — presentada clandestinamente en pendrive"],desc:"Filmada en secreto con un iPhone bajo arresto domiciliario. Panahi no puede filmar así que 'describe' la película que quisiera hacer. Sacada de Irán escondida en una torta.",difficulty:"Avanzado",color:"#7a9e8a",imdb:7.7,rt:98,streaming:["MUBI","KANOPY","CRITERION"],era:"Panahi"},
+  {title:"Taxi",original:"Taxi",director:"Jafar Panahi",year:2015,theme:["Censura","Cotidianeidad","Teherán"],region:"Calles de Teherán",awards:["Oso de Oro Berlín"],desc:"Panahi conduce un taxi con una cámara en el tablero. Sus pasajeros son Teherán en estado puro. El cine más libre hecho bajo la mayor represión posible.",difficulty:"Accesible",color:"#7a9e8a",imdb:7.5,rt:99,streaming:["MUBI","KANOPY","CRITERION","PRIME"],era:"Panahi"},
+  {title:"3 caras",original:"Se rokh",director:"Jafar Panahi",year:2018,theme:["Mujeres","Arte","Vida rural vs modernidad"],region:"Aldeas del noroeste iraní — Azerbaiyán iraní",awards:["Premio al Mejor Guión Cannes"],desc:"Panahi y la actriz Behnaz Jafari manejan hacia el noroeste para encontrar a una chica que envió un video suicida porque su familia le prohibía estudiar actuación.",difficulty:"Iniciado",color:"#7a9e8a",imdb:7.3,rt:96,streaming:["MUBI","KANOPY"],era:"Panahi"},
+  {title:"Esto no es una película — Sin oso",original:"Khers nist",director:"Jafar Panahi",year:2022,theme:["Censura","Amor","Exilio"],region:"Aldea fronteriza — Turquía/Irán",awards:["León de Plata Venecia"],desc:"Panahi dirige remotamente desde una aldea iraní fronteriza una película que se rueda en Turquía. Dos historias de amor paralelas, dos tipos de exilio. Filmada mientras esperaba juicio.",difficulty:"Avanzado",color:"#7a9e8a",imdb:7.5,rt:97,streaming:["MUBI","KANOPY"],era:"Panahi"},
+  {title:"Fue solo un accidente",original:"Dar bab-e yek hādese",director:"Jafar Panahi",year:2024,theme:["Tortura","Memoria","Sistema judicial"],region:"Teherán",awards:["Nominada Oscar Mejor Película Internacional 2025"],desc:"Un ex preso cree reconocer a su torturador en un accidente de tráfico. Thriller político escrito con su coguionista Mahmoudian mientras ambos estaban en Evin.",difficulty:"Iniciado",color:"#7a9e8a",imdb:7.8,rt:91,streaming:["MUBI","RENT"],era:"Panahi"},
+
+  // ── MAJIDI ──
+  {title:"Los niños del cielo",original:"Bacheha-Ye aseman",director:"Majid Majidi",year:1997,theme:["Infancia","Pobreza","Familia"],region:"Teherán — barrios populares",awards:["Nominada Oscar Mejor Película Extranjera"],desc:"Dos hermanos comparten un par de zapatos. Primera nominación iraní al Oscar. La película iraní más vista en el mundo. Humanismo puro, sin trampa ni cartón.",difficulty:"Accesible",color:"#8a7ab5",imdb:8.2,rt:99,streaming:["NETFLIX","KANOPY","PRIME","MUBI"],era:"Majidi"},
+  {title:"El color del paraíso",original:"Rang-e khoda",director:"Majid Majidi",year:1999,theme:["Discapacidad","Fe","Naturaleza"],region:"Norte — bosques del Alborz",awards:["Premio del Público Montreal"],desc:"Un niño ciego y su padre en los bosques del norte iraní. Las texturas del bosque gilaki filmadas para que el espectador también las toque. La película más bella de Majidi.",difficulty:"Accesible",color:"#8a7ab5",imdb:8.0,rt:97,streaming:["NETFLIX","KANOPY","PRIME","MUBI"],era:"Majidi"},
+  {title:"Baran",original:"Baran",director:"Majid Majidi",year:2001,theme:["Migración","Amor","Clase obrera"],region:"Teherán — obra de construcción",awards:["Crystal Bear Berlín"],desc:"Un joven trabajador iraní se enamora de un refugiado afgano que se descubre es una mujer disfrazada. La migración afgana en Irán vista con una ternura que rompe.",difficulty:"Accesible",color:"#8a7ab5",imdb:7.6,rt:96,streaming:["KANOPY","MUBI","PRIME"],era:"Majidi"},
+  {title:"La canción de los gorriones",original:"Avaze gonjeshkha",director:"Majid Majidi",year:2008,theme:["Familia","Campo vs ciudad","Codicia"],region:"Teherán y norte de Irán",awards:["Crystal Bear Berlín"],desc:"Un criador de avestruces llega a Teherán cuando su hija pierde el audífono. La ciudad lo va transformando. El contraste más hermoso entre el norte verde y el concreto de Teherán.",difficulty:"Accesible",color:"#8a7ab5",imdb:7.6,rt:89,streaming:["KANOPY","MUBI","PRIME"],era:"Majidi"},
+
+  // ── FARHADI ──
+  {title:"Fuego de artificio del miércoles",original:"Chaharshanbe-soori",director:"Asghar Farhadi",year:2006,theme:["Celos","Clase media","Teherán"],region:"Teherán",awards:["Nominada Oso de Plata Berlín"],desc:"La noche del miércoles de fuego — la fiesta preislámica que nadie pudo suprimir — una joven descubre los secretos de la familia vecina. El Farhadi más cinematográfico y menos conocido.",difficulty:"Iniciado",color:"#c87070",imdb:7.4,rt:88,streaming:["MUBI","KANOPY","RENT"],era:"Farhadi"},
+  {title:"Acerca de Elly",original:"Darbareye Elly",director:"Asghar Farhadi",year:2009,theme:["Secretos","Clase media","Culpa"],region:"Costa del Caspio — Shomal",awards:["Oso de Plata Berlín — Mejor Dirección"],desc:"Un grupo de amigos de vacaciones en la costa del Caspio. Una mujer desaparece. El thriller moral más perturbador de Farhadi — y el más iraní de todos sus films.",difficulty:"Iniciado",color:"#c87070",imdb:8.0,rt:99,streaming:["MUBI","KANOPY","PRIME"],era:"Farhadi"},
+  {title:"A Separation",original:"Jodaeiye Nader az Simin",director:"Asghar Farhadi",year:2011,theme:["Divorcio","Clase media","Moral"],region:"Teherán",awards:["Oscar Película Extranjera","Oso de Oro Berlín"],desc:"Una pareja decide divorciarse. Un thriller moral sin villanos donde todos tienen razón y todos mienten un poco. La película iraní más premiada de la historia.",difficulty:"Accesible",color:"#c87070",imdb:8.3,rt:99,streaming:["NETFLIX","MUBI","KANOPY","PRIME","CRITERION"],era:"Farhadi"},
+  {title:"El pasado",original:"Le Passé",director:"Asghar Farhadi",year:2013,theme:["Familia","Secretos","Divorcio"],region:"París (iraní en Francia)",awards:["Premio del Jurado Cannes"],desc:"Un iraní vuelve a París para firmar el divorcio con su mujer francesa. Lo que parece un trámite se convierte en excavación arqueológica de secretos familiares.",difficulty:"Iniciado",color:"#c87070",imdb:7.9,rt:97,streaming:["MUBI","PRIME","KANOPY"],era:"Farhadi"},
+  {title:"El viajante",original:"Forushande",director:"Asghar Farhadi",year:2016,theme:["Honor","Trauma","Clase media"],region:"Teherán",awards:["Oscar Película Extranjera","Mejor Actor Cannes"],desc:"Una pareja de actores ensaya 'Muerte de un viajante' de Miller. La vida real se convierte en una versión iraní de la obra. La justicia, la venganza y la humillación.",difficulty:"Iniciado",color:"#c87070",imdb:7.8,rt:97,streaming:["NETFLIX","MUBI","PRIME","KANOPY"],era:"Farhadi"},
+  {title:"Un héroe",original:"Ghahreman",director:"Asghar Farhadi",year:2021,theme:["Honor","Redes sociales","Sistema judicial"],region:"Shiraz",awards:["Gran Premio del Jurado Cannes"],desc:"Un preso devuelve una bolsa de monedas de oro. Se convierte en héroe viral en redes sociales. Farhadi analiza cómo la fama digital destruye y construye reputaciones en Irán.",difficulty:"Iniciado",color:"#c87070",imdb:7.2,rt:83,streaming:["PRIME","MUBI","KANOPY"],era:"Farhadi"},
+
+  // ── GHOBADI ──
+  {title:"Un tiempo para caballos borrachos",original:"Zamani barayé masti asbha",director:"Bahman Ghobadi",year:2000,theme:["Familia","Supervivencia","Kurdos"],region:"Kurdistán iraní — invierno",awards:["Cámara de Oro Cannes"],desc:"Hermanos kurdos en el invierno brutal de la frontera Irán-Irak intentando salvar al menor de la familia enfermo. La película que puso el cine kurdo en el mapa mundial.",difficulty:"Iniciado",color:"#6a9e7a",imdb:7.9,rt:96,streaming:["MUBI","KANOPY","CRITERION"],era:"Ghobadi"},
+  {title:"Tortugas pueden volar",original:"Lakposhtha hâm parvaz mikonand",director:"Bahman Ghobadi",year:2004,theme:["Guerra","Infancia","Kurdos"],region:"Kurdistán — frontera Iraq-Turquía",awards:["Globo de Oro Cine Europeo","Premio Especial Berlín"],desc:"Niños kurdos recogen minas antipersonales para vender, días antes de la invasión americana de Irak. Sin actores adultos profesionales. La guerra vista desde los ojos de quienes la padecen.",difficulty:"Iniciado",color:"#6a9e7a",imdb:8.0,rt:97,streaming:["MUBI","KANOPY","CRITERION","PRIME"],era:"Ghobadi"},
+  {title:"Nadie sabe nada de los gatos persas",original:"Kasi az gorbehaye irani khabar nadareh",director:"Bahman Ghobadi",year:2009,theme:["Música underground","Juventud","Censura"],region:"Teherán — sótanos y azoteas",awards:["Premio Especial Un Certain Regard Cannes"],desc:"Dos músicos iraníes intentan formar una banda y conseguir visas para tocar en Londres. Teherán underground: jazz, rock, rap, metal — todo prohibido — en sótanos y azoteas.",difficulty:"Accesible",color:"#6a9e7a",imdb:7.5,rt:90,streaming:["MUBI","KANOPY","PRIME"],era:"Ghobadi"},
+
+  // ── RASOULOF ──
+  {title:"La señorita",original:"Keshtzar haye sepid",director:"Mohammad Rasoulof",year:2009,theme:["Corrupción","Sistema judicial","Moral"],region:"Norte de Irán",awards:["Un Certain Regard Cannes"],desc:"Un juez es enviado al norte a supervisar la ejecución de una prisionera política. Los primeros pasos de Rasoulof hacia su obsesión con el sistema de pena de muerte iraní.",difficulty:"Avanzado",color:"#b05050",imdb:7.2,rt:87,streaming:["MUBI","KANOPY"],era:"Rasoulof"},
+  {title:"No hay mal",original:"Sheytan vojud nadarad",director:"Mohammad Rasoulof",year:2020,theme:["Pena de muerte","Complicidad","Moral"],region:"Varias regiones de Irán",awards:["Oso de Oro Berlín"],desc:"Cuatro historias sobre la responsabilidad individual frente a la pena de muerte en Irán. Filmada completamente en secreto. Rasoulof recibió el Oso de Oro en absentia desde su arresto domiciliario.",difficulty:"Avanzado",color:"#b05050",imdb:8.0,rt:95,streaming:["MUBI","KANOPY","PRIME"],era:"Rasoulof"},
+  {title:"La semilla del higo sagrado",original:"Dane-ye anjir-e ma'abed",director:"Mohammad Rasoulof",year:2024,theme:["Represión","Familia","Mujer Vida Libertad"],region:"Teherán",awards:["Premio Especial del Jurado Cannes","Preseleccionada Oscar 2025"],desc:"Un juez del tribunal revolucionario lleva el arma estatal a casa. Sus hijas participan en las protestas de Mujer-Vida-Libertad. Rasoulof la filmó mientras preparaba su fuga de Irán a pie.",difficulty:"Iniciado",color:"#b05050",imdb:7.8,rt:98,streaming:["MUBI","KANOPY","RENT"],era:"Rasoulof"},
+
+  // ── OTROS DIRECTORES DE CULTO ──
+  {title:"Persépolis",original:"Persepolis",director:"Marjane Satrapi",year:2007,theme:["Revolución","Mujer","Exilio"],region:"Teherán / Viena / París",awards:["Premio del Jurado Cannes","Nominada Oscar Mejor Animación"],desc:"Basada en la novela gráfica autobiográfica de Satrapi. Una niña crece durante la Revolución Islámica. La única película animada del cine iraní que alcanzó audiencia mundial.",difficulty:"Accesible",color:"#a08090",imdb:8.0,rt:96,streaming:["NETFLIX","MUBI","PRIME","CRITERION","KANOPY"],era:"Otros"},
+  {title:"Bajo la piel de la ciudad",original:"Zir-e poost-e shahr",director:"Rakhshan Banietemad",year:2001,theme:["Clase obrera","Mujeres","Familia"],region:"Teherán — barrios obreros",awards:["Festival de Fajr — Mejor Película"],desc:"Una madre trabajadora de fábrica intenta mantener a su familia a flote en el Teherán obrero. La directora más importante del cine iraní posrevolucionario. La Loach iraní.",difficulty:"Iniciado",color:"#9a7060",imdb:7.5,rt:92,streaming:["MUBI","KANOPY"],era:"Otros"},
+  {title:"El candidato",original:"Namzad",director:"Saeed Roustayi",year:2016,theme:["Familia","Pobreza","Matrimonio"],region:"Teherán",awards:["Festival de Fajr — Mejor Película"],desc:"La boda de la hija menor de una familia pobre que no tiene dinero para el ajuar. Un retrato coral de la clase trabajadora iraní contemporánea con una veracidad que aplasta.",difficulty:"Accesible",color:"#9a8060",imdb:7.5,rt:88,streaming:["MUBI","KANOPY","RENT"],era:"Otros"},
+  {title:"La ley de Teherán",original:"Metri shesh va nim",director:"Saeed Roustayi",year:2019,theme:["Narcotráfico","Policía","Sistema judicial"],region:"Teherán",awards:["Festival de Fajr — Mejor Película"],desc:"Un detective obsesionado persigue a un narco que también tiene familia y razones propias. El thriller más crudo y cinematográfico del cine iraní reciente. Comparada con The Wire.",difficulty:"Iniciado",color:"#9a8060",imdb:8.1,rt:95,streaming:["MUBI","KANOPY","NETFLIX"],era:"Otros"},
+  {title:"Una separación iraní — El oso no existe",original:"Khers nist",director:"Jafar Panahi",year:2022,theme:["Exilio","Amor","Frontera"],region:"Aldea fronteriza iraní — Turquía",awards:["León de Plata Venecia"],desc:"Panahi dirige remotamente desde una aldea iraní una película que se rueda en Turquía. Reflexión sobre el exilio, el amor y los muros reales e invisibles. Filmada mientras esperaba sentencia.",difficulty:"Avanzado",color:"#7a9e8a",imdb:7.5,rt:97,streaming:["MUBI","KANOPY"],era:"Panahi"},
+  {title:"Acerca de un chico — Ahlat agaci",original:"Ahlat Agaci",director:"Nuri Bilge Ceylan",year:2018,theme:["Identidad","Literatura","Vida rural"],region:"Çanakkale, Turquía (iraní adyacente)",awards:["Palma de Oro Cannes — Nominada"],desc:"Aunque es turca, su espíritu, paisaje y poética son los más cercanos al cine iraní del norte que se filma hoy. Para quien ama Kiarostami y quiere más.",difficulty:"Avanzado",color:"#7a7a9a",imdb:8.0,rt:96,streaming:["MUBI","KANOPY","PRIME"],era:"Otros"},
+  {title:"Una mujer iraní",original:"Yeki az ma dovota",director:"Tahmineh Milani",year:2002,theme:["Mujeres","Violencia doméstica","Justicia"],region:"Teherán",awards:["Festival de Fajr"],desc:"Una mujer escapa del marido violento. Milani fue arrestada por el régimen después de este film acusada de apoyar grupos contrarrevolucionarios. La directora más valiente de Irán.",difficulty:"Iniciado",color:"#9a6070",imdb:7.2,rt:85,streaming:["KANOPY","RENT"],era:"Otros"},
+];
+
+const DC={
+  "Abbas Kiarostami":"#c8a96e","Jafar Panahi":"#7a9e8a",
+  "Majid Majidi":"#8a7ab5","Asghar Farhadi":"#c87070",
+  "Bahman Ghobadi":"#6a9e7a","Mohammad Rasoulof":"#b05050",
+  "Dariush Mehrjui":"#7a8a6a","Bahram Beyzai":"#6a9080",
+  "Masud Kimiai":"#8a7060","Forugh Farrokhzad":"#9a7a9a",
+  "Marjane Satrapi":"#a08090","Rakhshan Banietemad":"#9a7060",
+  "Saeed Roustayi":"#9a8060","Tahmineh Milani":"#9a6070",
+  "Nuri Bilge Ceylan":"#7a7a9a"
+};
+
+const DO={"Accesible":1,"Iniciado":2,"Avanzado":3};
+let CS="year_asc",FD="",FDiff="",FTh="",FSt="",FDL="",OPEN=null;
+
+const dirs=[...new Set(F.map(f=>f.director))].sort();
+const themes=[...new Set(F.flatMap(f=>f.theme))].sort();
+const platforms=[...new Set(F.flatMap(f=>f.streaming))].sort();
+
+const sd=document.getElementById("sd");
+dirs.forEach(d=>{const o=document.createElement("option");o.value=d;o.textContent=d;sd.appendChild(o);});
+const sth=document.getElementById("sth");
+themes.forEach(t=>{const o=document.createElement("option");o.value=t;o.textContent=t;sth.appendChild(o);});
+const sst=document.getElementById("sst");
+platforms.forEach(p=>{const o=document.createElement("option");o.value=p;o.textContent=p;sst.appendChild(o);});
+
+// Director legend
+const dl=document.getElementById("dl");
+dirs.forEach(d=>{
+  const c=F.filter(f=>f.director===d).length;
+  const el=document.createElement("div");
+  el.className="di2";el.dataset.dir=d;
+  el.innerHTML=`<div class="dd" style="background:${DC[d]||'#888'}"></div><span class="dn">${d}</span><span class="dc">(${c})</span>`;
+  el.addEventListener("click",()=>{FDL=FDL===d?"":d;FD=FDL;sd.value=FDL;render();});
+  dl.appendChild(el);
+});
+
+function rtClass(s){if(!s)return"sc-rent";if(s>=90)return"sc-rt-cert";if(s>=60)return"sc-rt-fresh";return"sc-rt-rotten";}
+function rtIcon(s){if(!s)return"🍅";if(s>=90)return"🏆";if(s>=60)return"🍅";return"💀";}
+
+function streamBadge(s){
+  const m={"MUBI":"sp-mubi","NETFLIX":"sp-netflix","PRIME":"sp-prime","CRITERION":"sp-criterion","KANOPY":"sp-kanopy","YOUTUBE":"sp-youtube","FANDOR":"sp-fandor","RENT":"sp-rent"};
+  return `<span class="sp ${m[s]||'sp-rent'}">${s}</span>`;
+}
+
+function getFiltered(){
+  return F
+    .filter(f=>!FD||f.director===FD)
+    .filter(f=>!FDiff||f.difficulty===FDiff)
+    .filter(f=>!FTh||f.theme.includes(FTh))
+    .filter(f=>!FSt||f.streaming.includes(FSt))
+    .sort((a,b)=>{
+      if(CS==="year_asc")return a.year-b.year;
+      if(CS==="year_desc")return b.year-a.year;
+      if(CS==="imdb")return b.imdb-a.imdb;
+      if(CS==="director")return a.director.localeCompare(b.director);
+      if(CS==="difficulty")return DO[a.difficulty]-DO[b.difficulty];
+      return 0;
+    });
+}
+
+function render(){
+  const filtered=getFiltered();
+  document.getElementById("cl").textContent=`${filtered.length} película${filtered.length!==1?"s":""}`;
+  document.querySelectorAll(".di2").forEach(el=>el.classList.toggle("dimmed",!!FDL&&el.dataset.dir!==FDL));
+  const fg=document.getElementById("fg");
+  if(!filtered.length){fg.innerHTML=`<div class="nr">Sin resultados — probá otra combinación</div>`;return;}
+  fg.innerHTML="";
+  
+  let lastEra="";
+  filtered.forEach(film=>{
+    if(CS==="director"&&film.era!==lastEra&&false){} // era labels only on year sort
+    const dc=film.difficulty==="Accesible"?"da":film.difficulty==="Iniciado"?"di":"dv";
+    const isOpen=OPEN===film.title;
+    const card=document.createElement("div");
+    card.className="card"+(isOpen?" open":"");
+    card.style.setProperty("--c",film.color);
+    card.innerHTML=`
+      <div class="ct">
+        <span class="yr">${film.year}</span>
+        <span class="df ${dc}">${film.difficulty}</span>
+      </div>
+      <div class="ti">${film.title}</div>
+      <div class="or">${film.original}</div>
+      <div class="dr">${film.director}</div>
+      <div class="scores">
+        <span class="sc sc-imdb"><span class="sc-label">IMDB</span> ⭐ ${film.imdb}</span>
+        <span class="sc ${rtClass(film.rt)}"><span class="sc-label">RT</span> ${rtIcon(film.rt)} ${film.rt}%</span>
+      </div>
+      <div class="de">${film.desc}</div>
+      <div class="tags">${film.theme.map(t=>`<span class="tg">${t}</span>`).join("")}</div>
+      <div class="extra">
+        <div class="er">📍 ${film.region}</div>
+        <div class="er">🏆 ${film.awards.join(" · ")}</div>
+        <div class="er" style="margin-top:.4rem;font-size:.7rem;color:#5a4a30">Dónde ver:</div>
+        <div class="stream">${film.streaming.map(streamBadge).join("")}</div>
+      </div>`;
+    card.addEventListener("click",()=>{OPEN=OPEN===film.title?null:film.title;render();});
+    fg.appendChild(card);
+  });
+}
+
+document.querySelectorAll(".sb").forEach(b=>{
+  b.addEventListener("click",()=>{
+    CS=b.dataset.sort;
+    document.querySelectorAll(".sb").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");render();
+  });
+});
+document.getElementById("sd").addEventListener("change",e=>{FD=e.target.value;FDL=e.target.value;render();});
+document.getElementById("sdiff").addEventListener("change",e=>{FDiff=e.target.value;render();});
+document.getElementById("sth").addEventListener("change",e=>{FTh=e.target.value;render();});
+document.getElementById("sst").addEventListener("change",e=>{FSt=e.target.value;render();});
+
+// PWA
+let dp=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();dp=e;document.getElementById("ib").classList.add("show");});
+document.getElementById("ibb").addEventListener("click",async()=>{if(!dp)return;dp.prompt();await dp.userChoice;dp=null;document.getElementById("ib").classList.remove("show");});
+document.getElementById("db").addEventListener("click",()=>document.getElementById("ib").classList.remove("show"));
+if("serviceWorker"in navigator)navigator.serviceWorker.register("/sw.js").catch(()=>{});
+
+render();
+</script>
+</body>
+</html>
