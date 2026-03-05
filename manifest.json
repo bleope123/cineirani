@@ -1,0 +1,24 @@
+{
+  "name": "Cine Iraní — سینمای ایران",
+  "short_name": "Cine Iraní",
+  "description": "Guía de películas del cine iraní con filtros por director, temática y dificultad",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0d0c0a",
+  "theme_color": "#c8a96e",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
