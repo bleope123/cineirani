@@ -2,7 +2,7 @@
   "name": "Cine Iraní — سینمای ایران",
   "short_name": "Cine Iraní",
   "description": "Guía de películas del cine iraní con filtros por director, temática y dificultad",
-  "start_url": "/",
+  "start_url": "/cineirani/",
   "display": "standalone",
   "background_color": "#0d0c0a",
   "theme_color": "#c8a96e",
